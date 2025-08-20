@@ -1,14 +1,16 @@
 # TurboRecon
 Turbo Recon is a python script that automates the early stages of a pentest. It facilitates more consistent testing and is easy to extend
 
-##Usage
+## Usage
 ### It slices, it dices, it automates your recon scanning 
+```
 python3 turbohacker.py                     
 usage: turbohacker.py [-h] [--no-ping] [--username USERNAME] [--wordlist WORDLIST] [--threads THREADS] ip
 turbohacker.py: error: the following arguments are required: ip
-
+```
 
 ### Sample output
+```
 python3 turbohacker.py 10.10.11.82 --threads 50
 Pinging target 10.10.11.82...
 Ping successful. Target is up.
@@ -30,9 +32,10 @@ Scan Summary:
 +--------+-----------+----------+
 
 Detailed scan results saved to pentest_report_10.10.11.82_20250820_181557.txt
-
+```
 
 ### Sample Report
+```
 Pentest Report for 10.10.11.82
 Generated on: 20250820_181557
 
@@ -238,7 +241,7 @@ Command: whatweb http://10.10.11.82:8000
 ========================================
 http://10.10.11.82:8000 [200 OK] Country[RESERVED][ZZ], HTML5, HTTPServer[gunicorn/20.0.4], IP[10.10.11.82], Script, Title[Welcome to CodeTwo]
 
-
+```
 Scan Summary Table:
   Port  Service    Status
     22  ssh        Scanned
