@@ -4,14 +4,14 @@ Turbo Recon is a python script that automates the early stages of a pentest. It 
 ## Usage
 ### It slices, it dices, it automates your recon scanning 
 ```
-python3 turbohacker.py                     
-usage: turbohacker.py [-h] [--no-ping] [--username USERNAME] [--wordlist WORDLIST] [--threads THREADS] ip
+python3 turborecon.py                     
+usage: turborecon.py [-h] [--no-ping] [--username USERNAME] [--wordlist WORDLIST] [--threads THREADS] ip
 turbohacker.py: error: the following arguments are required: ip
 ```
 
 ### Sample output
 ```
-python3 turbohacker.py 10.10.11.82 --threads 50
+python3 turborecon.py 10.10.11.82 --threads 50
 Pinging target 10.10.11.82...
 Ping successful. Target is up.
 Running nmap scan on 10.10.11.82...
