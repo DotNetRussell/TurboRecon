@@ -241,9 +241,9 @@ Command: whatweb http://10.10.11.82:8000
 ========================================
 http://10.10.11.82:8000 [200 OK] Country[RESERVED][ZZ], HTML5, HTTPServer[gunicorn/20.0.4], IP[10.10.11.82], Script, Title[Welcome to CodeTwo]
 
-```
 Scan Summary Table:
   Port  Service    Status
     22  ssh        Scanned
   8000  http       Scanned
 Detailed scan results saved to pentest_report_10.10.11.82_20250820_181557.txt
+```
