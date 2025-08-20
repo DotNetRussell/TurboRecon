@@ -72,6 +72,16 @@ def run_whatweb(ip, port, output_file):
     whatweb_cmd = f"whatweb http://{ip}:{port}"
     run_command(whatweb_cmd, output_file)
 
+def run_curl(ip, port, output_file):
+    print(f"Running curl banner grabbing on {ip}:{port}...")
+    curl_cmd = f"curl -I http://{ip}:{port}"
+    run_command(curl_cmd, output_file)
+
+def run_cewl(ip, port, output_file):
+    print(f"Running cewl on {ip}:{port}...")
+    cewl_cmd = f"cewl http://{ip}:{port} -w cewl_wordlist.txt"
+    run_command(cewl_cmd, output_file)
+
 def run_enum4linux(ip, output_file):
     print(f"Running enum4linux on {ip}...")
     enum4linux_cmd = f"enum4linux -a {ip}"
@@ -81,6 +91,16 @@ def run_smbclient(ip, output_file):
     print(f"Running smbclient enumeration on {ip}...")
     smbclient_cmd = f"smbclient -L //{ip} -N"
     run_command(smbclient_cmd, output_file)
+
+def run_smb_null_session(ip, output_file):
+    print(f"Checking SMB null session on {ip}...")
+    smb_null_cmd = f"smbclient -L //{ip} -U '%' -N"
+    run_command(smb_null_cmd, output_file)
+
+def run_rpc_null_session(ip, output_file):
+    print(f"Checking RPC null session on {ip}...")
+    rpc_null_cmd = f"rpcclient -U '' -N {ip} -c 'srvinfo;netshareenum'"
+    run_command(rpc_null_cmd, output_file)
 
 def run_ftp_anonymous(ip, port, output_file):
     print(f"Attempting anonymous FTP login on {ip}:{port}...")
@@ -96,6 +116,29 @@ def run_hydra_ssh(ip, port, username, wordlist, threads, output_file):
     print(f"Running hydra SSH brute-force on {ip}:{port} with username '{username}', wordlist '{wordlist}', and {threads} threads...")
     hydra_cmd = f"hydra -l {username} -P {wordlist} ssh://{ip}:{port} -t {threads}"
     run_command(hydra_cmd, output_file)
+
+def run_hydra_telnet(ip, port, username, wordlist, threads, output_file):
+    print(f"Running hydra Telnet brute-force on {ip}:{port} with username '{username}', wordlist '{wordlist}', and {threads} threads...")
+    hydra_cmd = f"hydra -l {username} -P {wordlist} telnet://{ip}:{port} -t {threads}"
+    run_command(hydra_cmd, output_file)
+
+def run_evil_winrm(ip, port, output_file):
+    print(f"Checking WinRM null session and common logins on {ip}:{port}...")
+    # Null session check
+    print(f"Trying WinRM null session...")
+    null_cmd = f"evil-winrm -i {ip} -u '' -p '' -P {port} --no-banner -s whoami"
+    run_command(null_cmd, output_file)
+    
+    # Common credentials check
+    common_creds = [
+        ("Administrator", "password"),
+        ("Administrator", "admin"),
+        ("Administrator", "Password123")
+    ]
+    for username, password in common_creds:
+        print(f"Trying WinRM login with {username}:{password}...")
+        winrm_cmd = f"evil-winrm -i {ip} -u '{username}' -p '{password}' -P {port} --no-banner -s whoami"
+        run_command(winrm_cmd, output_file)
 
 def run_ssh_nmap(ip, port, output_file):
     print(f"Running nmap SSH enumeration on {ip}:{port}...")
@@ -122,15 +165,52 @@ def run_nfs_showmount(ip, output_file):
     showmount_cmd = f"showmount -e {ip}"
     run_command(showmount_cmd, output_file)
 
+def run_kerberos_nmap(ip, port, domain, output_file):
+    print(f"Running nmap Kerberos enumeration on {ip}:{port}...")
+    kerberos_cmd = f"nmap --script krb5-enum-users --script-args krb5-enum-users.realm={domain} -p {port} {ip}"
+    run_command(kerberos_cmd, output_file)
+
+def run_ldapsearch(ip, port, domain, output_file):
+    print(f"Running ldapsearch on {ip}:{port}...")
+    ldap_cmd = f"ldapsearch -x -H ldap://{ip}:{port} -b 'dc={domain.split('.')[0]},dc={domain.split('.')[1]}'"
+    run_command(ldap_cmd, output_file)
+
+def run_rpcclient(ip, output_file):
+    print(f"Running rpcclient enumeration on {ip}...")
+    rpc_cmd = f"rpcclient -U '' -N {ip} -c 'enumdomusers'"
+    run_command(rpc_cmd, output_file)
+
+def run_nbtscan(ip, output_file):
+    print(f"Running nbtscan on {ip}...")
+    nbtscan_cmd = f"nbtscan {ip}"
+    run_command(nbtscan_cmd, output_file)
+
+def run_telnet_nmap(ip, port, output_file):
+    print(f"Running nmap Telnet enumeration on {ip}:{port}...")
+    telnet_cmd = f"nmap --script telnet-encryption,telnet-ntlm-info -p {port} {ip}"
+    run_command(telnet_cmd, output_file)
+
+def run_vnc_nmap(ip, port, output_file):
+    print(f"Running nmap VNC enumeration on {ip}:{port}...")
+    vnc_cmd = f"nmap --script vnc-info -p {port} {ip}"
+    run_command(vnc_cmd, output_file)
+
+def run_mysql_nmap(ip, port, output_file):
+    print(f"Running nmap MySQL enumeration on {ip}:{port}...")
+    mysql_cmd = f"nmap --script mysql-info,mysql-users -p {port} {ip}"
+    run_command(mysql_cmd, output_file)
+
 def main():
-    parser = argparse.ArgumentParser(description="OSCP Pentesting Automation Script with Configurable Brute-Forcing")
+    parser = argparse.ArgumentParser(description="OSCP Pentesting Automation Script with Configurable Brute-Forcing, Null Session, and WinRM Checks")
     parser.add_argument("ip", help="Target IP address")
     parser.add_argument("--no-ping", action="store_true", help="Disable ping check")
-    parser.add_argument("--username", default="admin", help="Username for FTP and SSH brute-forcing (default: admin)")
+    parser.add_argument("--username", default="admin", help="Username for FTP, SSH, and Telnet brute-forcing (default: admin)")
     parser.add_argument("--wordlist", default="/usr/share/wordlists/rockyou.txt", 
-                        help="Path to password wordlist for FTP and SSH brute-forcing (default: /usr/share/wordlists/rockyou.txt)")
+                        help="Path to password wordlist for FTP, SSH, and Telnet brute-forcing (default: /usr/share/wordlists/rockyou.txt)")
     parser.add_argument("--threads", type=int, default=4, 
-                        help="Number of threads for FTP and SSH brute-forcing with hydra (default: 4)")
+                        help="Number of threads for FTP, SSH, and Telnet brute-forcing with hydra (default: 4)")
+    parser.add_argument("--domain", default="example.local", 
+                        help="Domain for Kerberos and LDAP enumeration (default: example.local)")
     args = parser.parse_args()
 
     ip = args.ip
@@ -167,9 +247,13 @@ def main():
             run_dirb(ip, port, output_file)
             run_gobuster(ip, port, output_file)
             run_whatweb(ip, port, output_file)
+            run_curl(ip, port, output_file)
+            run_cewl(ip, port, output_file)
         elif service == 'smb':
             run_enum4linux(ip, output_file)
             run_smbclient(ip, output_file)
+            run_smb_null_session(ip, output_file)
+            run_rpc_null_session(ip, output_file)
         elif service == 'ftp':
             run_ftp_anonymous(ip, port, output_file)
             run_hydra_ftp(ip, port, args.username, args.wordlist, args.threads, output_file)
@@ -184,6 +268,24 @@ def main():
             run_smtp_enum(ip, port, output_file)
         elif service == 'nfs':
             run_nfs_showmount(ip, output_file)
+        elif service == 'kerberos':
+            run_kerberos_nmap(ip, port, args.domain, output_file)
+        elif service == 'ldap':
+            run_ldapsearch(ip, port, args.domain, output_file)
+        elif service in ['msrpc', 'epmap']:
+            run_rpcclient(ip, output_file)
+            run_rpc_null_session(ip, output_file)
+        elif service in ['netbios-ns', 'netbios-dgm', 'netbios-ssn']:
+            run_nbtscan(ip, output_file)
+        elif service == 'telnet':
+            run_telnet_nmap(ip, port, output_file)
+            run_hydra_telnet(ip, port, args.username, args.wordlist, args.threads, output_file)
+        elif service == 'vnc':
+            run_vnc_nmap(ip, port, output_file)
+        elif service == 'mysql':
+            run_mysql_nmap(ip, port, output_file)
+        elif service == 'wsman' or (service == 'http' and port in ['5985', '5986']):
+            run_evil_winrm(ip, port, output_file)
         else:
             with open(output_file, 'a') as f:
                 f.write(f"No specific tool for service {service} on port {port}\n")
