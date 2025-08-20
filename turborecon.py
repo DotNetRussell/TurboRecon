@@ -207,7 +207,7 @@ def main():
     parser.add_argument("--username", default="admin", help="Username for FTP, SSH, and Telnet brute-forcing (default: admin)")
     parser.add_argument("--wordlist", default="/usr/share/wordlists/rockyou.txt", 
                         help="Path to password wordlist for FTP, SSH, and Telnet brute-forcing (default: /usr/share/wordlists/rockyou.txt)")
-    parser.add_argument("--threads", type=int, default=4, 
+    parser.add_argument("--threads", type=int, default=50, 
                         help="Number of threads for FTP, SSH, and Telnet brute-forcing with hydra (default: 4)")
     parser.add_argument("--domain", default="example.local", 
                         help="Domain for Kerberos and LDAP enumeration (default: example.local)")
